@@ -32,7 +32,7 @@ var asteroidCollisionGroup;
 var planetCollisionGroup;
 
 function create() {
-
+    game.world.setBounds(0, 0, 2.5 * width, 2.5 * height);
     game.physics.startSystem(Phaser.Physics.P2JS);
     game.physics.p2.setImpactEvents(true);
     game.physics.p2.defaultRestitution = 0.8;
@@ -42,7 +42,7 @@ function create() {
     asteroidCollisionGroup = game.physics.p2.createCollisionGroup();
     planetCollisionGroup = game.physics.p2.createCollisionGroup();
 
-    game.world.setBounds(0, 0, 2.5 * width, 2.5 * height);
+    
 
     game.physics.p2.updateBoundsCollisionGroup();
 
@@ -86,6 +86,7 @@ function create() {
     ship.body.setCollisionGroup(shipCollisionGroup);
     ship.body.collides([asteroidCollisionGroup, planetCollisionGroup]);
 
+    ship.body.debug = true;
 
     game.camera.follow(ship);
 
@@ -148,7 +149,9 @@ function fireBullet () {
             p2.rotate(p1.x, p1.y, ship.rotation, false);
             bullet = bullets.create(p2.x, p2.y, 'bullet');
 
-            bullet.body.setRectangle(10,10);
+            bullet.body.debug = true;
+
+            bullet.body.setCircle(4);
             bullet.body.setCollisionGroup(bulletCollisionGroup);
             bullet.body.collides([asteroidCollisionGroup, planetCollisionGroup]);
 
@@ -156,8 +159,9 @@ function fireBullet () {
             bullet.reset(p2.x, p2.y);
             bullet.lifespan = 10000;
             bullet.rotation = ship.rotation;
+            bullet.body.collideWorldBounds = false;
 
-            console.log(bullet);
+            //console.log(bullet);
 
             // Frequence de tir
             bulletTime = game.time.now + 500;
@@ -179,10 +183,23 @@ function asteroidGenerator (x, y, velocity, angle) {
             asteroid.body.fixedRotation=true; 
             asteroid.lifespan = 60000;
 
+
             asteroid.body.velocity.x = Math.sin(angle) * velocity;
             asteroid.body.velocity.y = -Math.cos(angle) * velocity;
-            asteroid.body.setRectangleFromSprite('asteroid1');
-            asteroid.body.setCollisionGroup(asteroidCollisionGroup);
-            asteroid.body.collides([asteroidCollisionGroup, bulletCollisionGroup, planetCollisionGroup, shipCollisionGroup]);
+            asteroid.body.setCircle(16);
 
+            asteroid.body.debug = true;
+
+            asteroid.body.setCollisionGroup(asteroidCollisionGroup);
+            asteroid.body.collides([asteroidCollisionGroup, planetCollisionGroup, shipCollisionGroup]);
+
+            //  The asteroid will collide with the bullet, and when it strikes one the hitBullet callback will fire
+            asteroid.body.collides(bulletCollisionGroup, hitBullet, this);
+
+}
+
+// body 1 : caller, body2 : object hitted
+function hitBullet (body1, body2) {
+    body1.sprite.destroy();
+    body2.sprite.destroy();
 }
