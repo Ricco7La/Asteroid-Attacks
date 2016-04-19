@@ -6,10 +6,10 @@ var game = new Phaser.Game(width, height, Phaser.AUTO, 'Asteroids Attacks', { pr
 
 function preload() {
 
-    game.load.image('stars', 'assets/misc/starfield.jpg');
+    game.load.image('stars', 'assets/starfield.jpg');
     //game.load.image('ship', 'assets/sprites/thrust_ship2.png');
-    game.load.image('ship', 'assets/games/asteroids/ship.png');
-    game.load.image('bullet', 'assets/games/asteroids/bullets.png');
+    game.load.image('ship', 'assets/ship.png');
+    game.load.image('bullet', 'assets/bullets.png');
 
 }
 
