@@ -3,6 +3,7 @@ var height = window.innerHeight;
 var mapWidth = 2.5 * width;
 var mapHeight = 2.5 * height;
 
+var DebugMode = true;
 
 var game = new Phaser.Game(width, height, Phaser.AUTO, 'Asteroids Attacks', { preload: preload, create: create, update: update });
 
@@ -47,6 +48,8 @@ function create() {
     game.physics.startSystem(Phaser.Physics.P2JS);
     game.physics.p2.setImpactEvents(true);
     game.physics.p2.defaultRestitution = 1;
+    game.physics.p2.friction = 0;
+    game.physics.p2.applyGravity = false;
 
     shipCollisionGroup = game.physics.p2.createCollisionGroup();
     bulletCollisionGroup = game.physics.p2.createCollisionGroup();
@@ -72,9 +75,10 @@ function create() {
     bullets.setAll('anchor.y', 0.5);
     bullets.setAll('checkWorldBounds', true);
     bullets.setAll('outOfBoundsKill', true);
-    /*bullets.setAll('body.setCollisionGroup', bulletCollisionGroup);
+    /*
+    bullets.setAll('body.setCollisionGroup', bulletCollisionGroup);
     bullets.setAll('body.collides', [asteroidCollisionGroup, planetCollisionGroup]);
-    bullets.setAll('body.setRectangleFromSprite', 'bullet');*/
+    */
 
     // Our asteroid
     asteroids = game.add.group();
@@ -119,7 +123,7 @@ function create() {
     ship.body.setCollisionGroup(shipCollisionGroup);
     ship.body.collides([asteroidCollisionGroup, planetCollisionGroup]);
 
-    ship.body.debug = true;
+    ship.body.debug = DebugMode;
 
     game.camera.follow(ship);
 
@@ -170,7 +174,7 @@ function update() {
     }
 
     if (destroyedAsteroid == countAsteroid) {
-        Lose();
+        Win();
         destroyedAsteroid = 0;
     }
     
@@ -187,7 +191,7 @@ function fireBullet () {
             p2.rotate(p1.x, p1.y, ship.rotation, false);
             bullet = bullets.create(p2.x, p2.y, 'bullet');
 
-            bullet.body.debug = true;
+            bullet.body.debug = DebugMode;
 
             bullet.body.setCircle(4);
             bullet.body.setCollisionGroup(bulletCollisionGroup);
@@ -226,7 +230,7 @@ function asteroidGenerator (x, y, velocity, angle) {
             asteroid.body.velocity.y = -Math.cos(angle) * velocity;
             asteroid.body.setCircle(16);
 
-            asteroid.body.debug = true;
+            asteroid.body.debug = DebugMode;
 
             asteroid.body.setCollisionGroup(asteroidCollisionGroup);
             asteroid.body.collides(asteroidCollisionGroup);
@@ -246,7 +250,7 @@ function planetGenerator (x, y,mass, sprite) {
             planet.body.setCircle(planet.width / 2);
             console.log(planet.width);
 
-            planet.body.debug = true;
+            planet.body.debug = DebugMode;
 
             planet.body.setCollisionGroup(planetCollisionGroup);
 
@@ -274,13 +278,13 @@ function rndIntRange (min, max){
 function Lose () {
      setTimeout(function function_name (argument) {
          alert("You Lose");  
-    }, 250) 
+    }, 250);
 }
 
 function Win () {
      setTimeout(function function_name (argument) {
          alert("You Win");  
-    }, 250) 
+    }, 250); 
 }
 
 /*************************
@@ -290,26 +294,26 @@ function Win () {
 // body 1 : caller, body2 : object hitted
 function hitBulletFromAsteroid (body1, body2) {
     destroyedAsteroid++;
-    body1.sprite.destroy();
-    body2.sprite.destroy();
+    body1.sprite.kill();
+    body2.sprite.kill();
 }
 function hitShipFromAsteroid (body1, body2) {
-    body1.sprite.destroy();
-    body2.sprite.destroy();
+    body1.sprite.kill();
+    body2.sprite.kill();
     Lose();
     
 }
 function hitPlanetFromAsteroid (body1, body2) {
-    body1.sprite.destroy();
-    body2.sprite.destroy();
+    body1.sprite.kill();
+    body2.sprite.kill();
     Lose();
 }
 
 function hitBulletFromPlanet (body1, body2) {
-    body2.sprite.destroy();
+    body2.sprite.kill();
 }
 function hitShipFromPlanet (body1, body2) {
-    body2.sprite.destroy();
+    body2.sprite.kill();
     Lose();
 }
 
